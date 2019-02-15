@@ -4,3 +4,5 @@ Farmlife/obj/*
 Farmlife/Packages/*
 Farmlife/Assembly-CSharp.csproj
 Farmlife/Farmlife.sln
+Farmlife/build/*
+Farmlife/.vs/*
