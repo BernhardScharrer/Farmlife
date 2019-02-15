@@ -9,9 +9,6 @@ public class Farmlife : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Terrain = GetComponent<Terrain>();
-
-        LoadLevel(ref Terrain);
         Debug.Log("Initialized");
     }
 
@@ -23,7 +20,7 @@ public class Farmlife : MonoBehaviour
 
 
 
-    private void LoadLevel(ref Terrain terrain)
+    private void LoadMap()
     {
         
     }
