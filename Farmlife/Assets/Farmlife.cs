@@ -54,15 +54,18 @@ public class Farmlife : MonoBehaviour
         //Tilemap structures = map.transform.Find("Structures").gameObject.GetComponent<Tilemap>();
 
 
-        Debug.Log("Creating do");
+        Debug.Log("Creating grass tile ...");
+
         Tile grass = (Tile)Tile.CreateInstance("Tile");
-
         
-
         grass.sprite = sprites["grass"];
 
         Vector3Int position = new Vector3Int(0,0,0);
 
+        Debug.Log("Inserting grass tile ...");
+
         ground.SetTile(position, grass);
+
+        Debug.Log("Inserted grass tile!");
     }
 }
