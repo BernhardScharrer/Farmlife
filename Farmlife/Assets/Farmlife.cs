@@ -3,6 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+// for win forms
+using System;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
+
 public class Farmlife : MonoBehaviour
 {
     public Grid map;
@@ -30,10 +36,17 @@ public class Farmlife : MonoBehaviour
     {
         Debug.Log("Loading sprites ...");
 
+
+        //	-----------------------------------------------
+        //	create new dictionary to contain all sprites by name
+        //	-----------------------------------------------
         sprites = new Dictionary<string, Sprite>();
 
-        Debug.Log("grass");
-        
+
+        //	-----------------------------------------------
+        //	Load the sprites
+        //	-----------------------------------------------
+        // grass
         sprites.Add("grass", Resources.Load<Sprite>("Sprites/Ground/grass"));
 
         Debug.Log("Loaded sprites!");
