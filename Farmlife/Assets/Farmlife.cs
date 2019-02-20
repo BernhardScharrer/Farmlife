@@ -3,12 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-// for win forms
-using System;
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
-
 public class Farmlife : MonoBehaviour
 {
     public Grid map;
