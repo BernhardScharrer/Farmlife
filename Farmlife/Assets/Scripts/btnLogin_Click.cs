@@ -5,8 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 // for server communication
-using System.Net.Http;
-using System.Text;
+using Newtonsoft.Json;
 
 public class btnLogin_Click : MonoBehaviour
 {
@@ -15,7 +14,6 @@ public class btnLogin_Click : MonoBehaviour
     public InputField txtUsername;
     public InputField txtPassword;
 
-    private string postTarget = "https://fforganizer.at/farmlife/login.php";
     
 
     // Start is called before the first frame update
@@ -35,26 +33,26 @@ public class btnLogin_Click : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        ServerComm.Get(postTarget);
+        if (ServerComm.lastResponse != null)
+        {
+            Debug.Log(ServerComm.lastResponse);
+        }
+        
 
-        if (ServerComm.lastResponse == "true")
+        if (ServerComm.lastResponse == "Hello World!")
         {
             Debug.Log("Loading new scene ...");
 
             SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
         }
     }
-
+    
     void btnLogin_OnClick()
     {
-        string message = "{\n";
-        message += "\"Username\": \"" + txtUsername.text + "\",\n";
-        message += "\"Password\": \"" + txtPassword.text + "\"\n";
-        message += "}";
+        Login login = new Login(txtUsername.text, txtPassword.text);
+        
+        Debug.Log("Sending username and password to server:\n" + JsonConvert.SerializeObject(login));
 
-
-        Debug.Log("Sending username and password to server:\n" + message);
-
-        ServerComm.Post(postTarget, message);
+        ServerComm.Post("[1,2,3]");//JsonConvert.SerializeObject(login));
     }
 }
