@@ -53,6 +53,8 @@ public class btnLogin_Click : MonoBehaviour
         
         Debug.Log("Sending username and password to server:\n" + JsonConvert.SerializeObject(login));
 
-        ServerComm.Post("[1,2,3]");//JsonConvert.SerializeObject(login));
+        //ServerComm.Post(JsonConvert.SerializeObject(login));
+
+        ServerComm.PostWebRequest(login);
     }
 }
