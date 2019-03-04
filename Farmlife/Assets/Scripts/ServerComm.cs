@@ -48,15 +48,34 @@ public class ServerComm : MonoBehaviour
     {
         client = new HttpClient();
 
-        request = (HttpWebRequest)WebRequest.Create(postTarget);
-        request.KeepAlive = false;
-        request.ProtocolVersion = HttpVersion.Version10;
-        
+        string response = SendJsonRequest("{\"test\": \"Hello world!\"}");
+        Debug.Log(response);
+
     }
 
     void Update()
     {
         StartCoroutine(PostRequest());
+    }
+
+    public static string SendJsonRequest(string json)
+    {
+        string responseMessage = string.Empty;
+        string url = @"https://fforganizer.at/farmlife/farmlife.php?json=" + json;
+
+        HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+        request.AutomaticDecompression = DecompressionMethods.GZip;
+        request.Method = "GET";
+        request.ContentType = "application/json";
+
+        using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+        using (Stream stream = response.GetResponseStream())
+        using (StreamReader reader = new StreamReader(stream))
+        {
+            responseMessage = reader.ReadToEnd();
+        }
+
+        return responseMessage;
     }
 
     public static async void Post(string message)
