@@ -15,6 +15,9 @@ using Newtonsoft.Json;
 // for HttpWebRequest
 using System.Net;
 
+// for UnityWebRequest
+using UnityEngine.Networking;
+
 
 
 public class ServerComm : MonoBehaviour
@@ -37,6 +40,8 @@ public class ServerComm : MonoBehaviour
     //	-----------------------------------------------
     private static string postTarget = "https://fforganizer.at/farmlife/farmlife.php";
     public static string lastResponse { get; private set; }
+    private static string logFile = "Assets/log.txt";
+    private static object actMessage;
 
 
     void Start()
@@ -46,6 +51,12 @@ public class ServerComm : MonoBehaviour
         request = (HttpWebRequest)WebRequest.Create(postTarget);
         request.KeepAlive = false;
         request.ProtocolVersion = HttpVersion.Version10;
+        
+    }
+
+    void Update()
+    {
+        StartCoroutine(PostRequest());
     }
 
     public static async void Post(string message)
@@ -95,7 +106,14 @@ public class ServerComm : MonoBehaviour
             streamWriter.Write(dataString);
             streamWriter.Close();
         }
-        
+
+
+        using (StreamWriter streamWriter = new StreamWriter(logFile))
+        {
+            streamWriter.Write("Sent: " + dataString);
+            streamWriter.Close();
+        }
+
 
         Debug.Log("Done posting!");
 
@@ -119,12 +137,84 @@ public class ServerComm : MonoBehaviour
 
         using (StreamReader streamReader = new StreamReader(responseStream))
         {
-            Debug.Log("Length: " + responseStream.Length);
             lastResponse = streamReader.ReadToEnd();
         }
 
         Debug.Log("Read response!");
         
+    }
+
+    public static void PostUnityWebRequest(object message)
+    {
+        actMessage = message;
+    }
+    
+    private static IEnumerator PostRequest()
+    {
+        if (actMessage != null)
+        {
+            //	-----------------------------------------------
+            //	Convert message object to json string
+            //	-----------------------------------------------
+            Debug.Log("Converting message object to json string ...");
+            string jsonMessage = JsonUtility.ToJson(actMessage);
+            Debug.Log("Converted message object to json string!");
+
+
+            //	-----------------------------------------------
+            //	Prepare for post
+            //	-----------------------------------------------
+            // set url
+            Debug.Log("Setting target url and method ...");
+            var request = new UnityWebRequest(postTarget, "POST");
+            Debug.Log("Set target url and method!");
+
+            // convert json string to byte array
+            Debug.Log("Converting json string to byte array ...");
+            byte[] bodyRaw = new System.Text.UTF8Encoding().GetBytes(jsonMessage);
+            Debug.Log("Converted json string to byte array!");
+
+            // set content
+            Debug.Log("Creating upload handler ...");
+            request.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
+            Debug.Log("Created upload handler!");
+
+            // get stuff
+            Debug.Log("Creating buffer for download handler ...");
+            request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+            Debug.Log("Created buffer for download handler!");
+
+            // send content type
+            Debug.Log("Setting request header ...");
+            request.SetRequestHeader("Content-Type", "application/json");
+            Debug.Log("Set request header!");
+
+
+
+            //	-----------------------------------------------
+            //	Wait for response
+            //	-----------------------------------------------
+            Debug.Log("Waiting for response ...");
+            yield return request.SendWebRequest();
+            Debug.Log("Got response!");
+
+
+
+            //	-----------------------------------------------
+            //	See if there was an Error
+            //	-----------------------------------------------
+            if (request.isNetworkError)
+            {
+                Debug.Log("Something went wrong, and returned error: " + request.error);
+            }
+            else
+            {
+                Debug.Log("Response: " + request.downloadHandler.text);
+                lastResponse = request.downloadHandler.text;
+            }
+
+            actMessage = null;
+        }
     }
 
     public static async void Get()

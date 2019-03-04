@@ -55,6 +55,10 @@ public class btnLogin_Click : MonoBehaviour
 
         //ServerComm.Post(JsonConvert.SerializeObject(login));
 
-        ServerComm.PostWebRequest(login);
+        //ServerComm.PostWebRequest(login);
+
+        Debug.Log("Posting login data to server ...");
+        ServerComm.PostUnityWebRequest(login);
+        Debug.Log("Done posting login data to server!");
     }
 }
