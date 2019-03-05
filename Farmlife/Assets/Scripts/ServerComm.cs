@@ -17,8 +17,6 @@ using System.Net;
 // for UnityWebRequest
 using UnityEngine.Networking;
 
-
-
 public class ServerComm : MonoBehaviour
 {
 
