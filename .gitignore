@@ -6,3 +6,5 @@ Farmlife/Assembly-CSharp.csproj
 Farmlife/Farmlife.sln
 Farmlife/build/*
 Farmlife/.vs/*
+PyServer/venv/*
+Server/database.php

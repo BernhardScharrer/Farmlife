@@ -4,33 +4,35 @@ header('Content-Type: application/json');
 
 include_once 'database.php';
 
-echo json_encode($_POST);
-
-exit(0);
+$json = json_decode($_GET['json']);
 
 $db = connectDB();
 
-if (isset($_POST['login'])) {
+if (isset($json)) {
 
-    $login = $_POST['login'];
+    $login = $json->login;
 
-    $username = $login['username'];
-    $password= $login['password'];
+    $username = $login->username;
+    $password = $login->password;
 
-    $rs_user = $db->query("SELECT salt FROM user WHERE username='".$username."';");
+    $rs_user = $db->query("SELECT salt, password FROM user WHERE username='".$username."';");
 
     if ($rs_user->num_rows === 1) {
         $data = $rs_user->fetch_array();
         $salt = $data['salt'];
         $hash = md5($salt.$password.$salt);
 
-        if ($hash === $rs_user->$data['password']) {
+        if ($hash === $data['password']) {
 
             $db->close();
             proceed($username);
 
-        }
+        } else {
+		echo json_encode(array("auth"=>false));
+	}
 
+    } else {
+	    echo json_encode(array("auth"=>false));
     }
 
 
@@ -39,6 +41,8 @@ if (isset($_POST['login'])) {
 }
 
 function proceed($username) {
+
+
 
 }
 
