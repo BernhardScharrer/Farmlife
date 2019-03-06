@@ -6,44 +6,59 @@ using UnityEngine.Tilemaps;
 public class Farmlife : MonoBehaviour
 {
     public Grid map;
-    private Dictionary<string, Sprite> sprites;
+    public Dictionary<string, Tile> groundTiles { get; private set; }
 
     // Start is called before the first frame update
     void Start()
     {
         Debug.Log("Initializing ...");
-
+        
         LoadMap();
-
+        
         Debug.Log("Initialized");
     }
 
     // Update is called once per frame
     void Update()
     {
-        Debug.Log("Updated");
+        //Debug.Log("Updated");
     }
 
 
 
     private void LoadSprites()
     {
-        Debug.Log("Loading sprites ...");
-
-
         //	-----------------------------------------------
         //	create new dictionary to contain all sprites by name
         //	-----------------------------------------------
-        sprites = new Dictionary<string, Sprite>();
+        groundTiles = new Dictionary<string, Tile>();
+
 
 
         //	-----------------------------------------------
         //	Load the sprites
         //	-----------------------------------------------
-        // grass
-        sprites.Add("grass", Resources.Load<Sprite>("Sprites/Ground/grass"));
+        Debug.Log("Loading sprites ...");
+        Sprite[] spritesArr = Resources.LoadAll<Sprite>("SpriteSheet_Tiles");
+        Debug.Log("Loaded sprites: " + spritesArr.Length);
 
-        Debug.Log("Loaded sprites!");
+
+
+        //	------------------------------------------------------
+        //	Convert sprites to tiles and save them in a dictionary
+        //	------------------------------------------------------
+        Debug.Log("Converting sprites to tiles ...");
+
+        foreach (var sprite in spritesArr)
+        {
+            Tile tile = new Tile();
+            tile.sprite = sprite;
+
+            groundTiles.Add(sprite.name, tile);
+        }
+
+        Debug.Log("Conversion done ...");
+
     }
 
 
@@ -52,26 +67,22 @@ public class Farmlife : MonoBehaviour
     {
         LoadSprites();
 
-        Debug.Log("Getting reference to ground");
-        Tilemap ground = map.transform.Find("Ground").gameObject.GetComponent<Tilemap>();
-        //Tilemap bushes = map.transform.Find("Bushes").gameObject.GetComponent<Tilemap>();
-        //Tilemap fields = map.transform.Find("Fields").gameObject.GetComponent<Tilemap>();
-        //Tilemap crops = map.transform.Find("Crops").gameObject.GetComponent<Tilemap>();
-        //Tilemap pavement = map.transform.Find("Pavement").gameObject.GetComponent<Tilemap>();
-        //Tilemap structures = map.transform.Find("Structures").gameObject.GetComponent<Tilemap>();
+        Debug.Log("Getting reference to tilemaps");
+        Tilemap background = map.transform.Find("Background").gameObject.GetComponent<Tilemap>();
+        Tilemap foreground = map.transform.Find("Foreground").gameObject.GetComponent<Tilemap>();
 
 
-        Debug.Log("Creating grass tile ...");
-
-        Tile grass = (Tile)Tile.CreateInstance("Tile");
-        
-        grass.sprite = sprites["grass"];
+        Debug.Log("Creating position ...");
 
         Vector3Int position = new Vector3Int(0,0,0);
 
         Debug.Log("Inserting grass tile ...");
 
-        ground.SetTile(position, grass);
+        background.SetTile(position, groundTiles["grass"]);
+
+        position = new Vector3Int(1, 0, 0);
+
+        background.SetTile(position, groundTiles["field"]);
 
         Debug.Log("Inserted grass tile!");
     }
