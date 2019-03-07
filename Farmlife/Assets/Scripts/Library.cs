@@ -7,12 +7,12 @@ using UnityEngine.Tilemaps;
 
 namespace Library
 {
-    private static string logFile = "Assets/log.txt";
 
-    struct Tables
+    static class Tables
     {
-        string textureTable = "";
+        static public string textureTable = "Assets/Resources/TextureTable.txt";
     }
+
 
     [Serializable]
     public class Login
@@ -60,6 +60,7 @@ namespace Library
     [Serializable]
     public class Auth
     {
+        [SerializeField]
         public bool auth;
 
         public Auth()
@@ -73,6 +74,7 @@ namespace Library
     [Serializable]
     public class Map
     {
+        [SerializeField]
         Background background { get; set; }
 
         public Map()
@@ -86,17 +88,21 @@ namespace Library
     [Serializable]
     public class Background
     {
+        [SerializeField]
         int[,] sprites;
+
+        [SerializeField]
         int xMin;
+
+        [SerializeField]
         int yMin;
+
+        [SerializeField]
         int xMax;
+
+        [SerializeField]
         int yMax;
         
-        public Background()
-        {
-
-        }
-
         public Background(Tilemap tilemap)
         {
             BoundsInt bounds = tilemap.cellBounds;
@@ -106,19 +112,96 @@ namespace Library
             xMax = bounds.xMax;
             yMax = bounds.yMax;
 
-            for (int y = 0; y < bounds.yMax; y++)
+
+            //	--------------------------------------------------------
+            //	Load textureTable with codes and save it to a dictionary
+            //	--------------------------------------------------------
+            Dictionary<string, int> textureTable = new Dictionary<string, int>();
+            
+
+            using (StreamReader streamReader = new StreamReader(Tables.textureTable))
             {
-                for (int x = 0; x < bounds.xMax; x++)
+                string line;
+
+                while ((line = streamReader.ReadLine()) != null)
+                {
+                    string[] data = line.Split(' ');
+
+                    textureTable.Add(data[0], Convert.ToInt32(data[1]));
+                }
+
+                streamReader.Close();
+            }
+
+
+
+            //	--------------------------------------------------------------------
+            //	Save every tiles actual sprite as sprite number to the sprites array
+            //	--------------------------------------------------------------------
+            sprites = new int[xMax - xMin, yMax - yMin];
+
+
+            for (int x = 0; x < xMax - xMin; x++)
+            {
+                for (int y = 0; y < yMax - yMin; y++)
                 {
                     Tile tile = tilemap.GetTile<Tile>(new Vector3Int(x, y, 0));
 
-                    using (StreamWriter streamWriter = new StreamWriter(logFile))
+                    if (tile != null)
                     {
-                        streamWriter.Write("Sent: " + dataString);
-                        streamWriter.Close();
+                        sprites[x, y] = textureTable[tile.name];
                     }
+                    
                 }
             }
+        }
+
+        public Tilemap ToTilemap(Dictionary<string, Tile> groundTiles)
+        {
+            //	--------------------------------------------------------
+            //	Load textureTable with codes and save it to a dictionary
+            //	--------------------------------------------------------
+            Dictionary<int, string> textureTable = new Dictionary<int, string>();
+
+
+            using (StreamReader streamReader = new StreamReader(Tables.textureTable))
+            {
+                string line;
+
+                while ((line = streamReader.ReadLine()) != null)
+                {
+                    string[] data = line.Split(' ');
+
+                    textureTable.Add(Convert.ToInt32(data[1]), data[0]);
+                }
+
+                streamReader.Close();
+            }
+
+
+            Tilemap tilemap = new Tilemap();
+
+
+
+            //	-----------------------------------------------
+            //	Convert the 
+            //	-----------------------------------------------
+            for (int x = 0; x < xMax - xMin; x++)
+            {
+                for (int y = 0; y < yMax - yMin; y++)
+                {
+                    if (sprites[x, y] != 0)
+                    {
+                        string spriteName = textureTable[sprites[x, y]];
+
+                        tilemap.SetTile(new Vector3Int(xMin + x, yMin + y, 0), groundTiles[spriteName]);
+                    }
+
+                }
+            }
+
+
+            return tilemap;
         }
     }
 }

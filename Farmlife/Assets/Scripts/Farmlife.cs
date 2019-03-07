@@ -54,8 +54,9 @@ public class Farmlife : MonoBehaviour
         {
             Tile tile = new Tile();
             tile.sprite = sprite;
+            tile.name = sprite.name;
 
-            groundTiles.Add(sprite.name, tile);
+            groundTiles.Add(tile.name, tile);
         }
 
         Debug.Log("Conversion done ...");
