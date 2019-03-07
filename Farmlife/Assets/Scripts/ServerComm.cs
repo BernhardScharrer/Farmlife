@@ -37,7 +37,7 @@ public class ServerComm : MonoBehaviour
     ////	-----------------------------------------------
     //private static string postTarget = "https://fforganizer.at/farmlife/farmlife.php";
     //public static string lastResponse { get; private set; }
-    //private static string logFile = "Assets/log.txt";
+    
     //private static object actMessage;
 
 
