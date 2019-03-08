@@ -10,7 +10,7 @@ namespace Library
 
     static class Tables
     {
-        static public string textureTable = "Assets/Resources/TextureTable.txt";
+        static public string textureTable = "Assets/Resources/Data/TextureTable.txt";
     }
 
 
@@ -89,7 +89,7 @@ namespace Library
     public class Background
     {
         [SerializeField]
-        int[,] sprites;
+        int[][] sprites;
 
         [SerializeField]
         int xMin;
@@ -103,6 +103,8 @@ namespace Library
         [SerializeField]
         int yMax;
         
+
+
         public Background(Tilemap tilemap)
         {
             BoundsInt bounds = tilemap.cellBounds;
@@ -126,8 +128,8 @@ namespace Library
                 while ((line = streamReader.ReadLine()) != null)
                 {
                     string[] data = line.Split(' ');
-
-                    textureTable.Add(data[0], Convert.ToInt32(data[1]));
+                    
+                    textureTable.Add(data[1].Replace(Environment.NewLine, ""), Convert.ToInt32(data[0]));
                 }
 
                 streamReader.Close();
@@ -138,7 +140,15 @@ namespace Library
             //	--------------------------------------------------------------------
             //	Save every tiles actual sprite as sprite number to the sprites array
             //	--------------------------------------------------------------------
-            sprites = new int[xMax - xMin, yMax - yMin];
+            sprites = new int[xMax - xMin][];
+
+
+
+            for (int i = 0; i < sprites.Length; i++)
+            {
+                sprites[i] = new int[yMax - yMin];
+            }
+
 
 
             for (int x = 0; x < xMax - xMin; x++)
@@ -149,14 +159,18 @@ namespace Library
 
                     if (tile != null)
                     {
-                        sprites[x, y] = textureTable[tile.name];
+                        sprites[x][y] = textureTable[tile.name];
                     }
                     
                 }
             }
+            
+            Debug.Log("[0|0]: " + sprites[0][0]);
         }
 
-        public Tilemap ToTilemap(Dictionary<string, Tile> groundTiles)
+
+
+        public void ToTilemap(Tilemap background, Dictionary<string, Tile> groundTiles)
         {
             //	--------------------------------------------------------
             //	Load textureTable with codes and save it to a dictionary
@@ -172,14 +186,12 @@ namespace Library
                 {
                     string[] data = line.Split(' ');
 
-                    textureTable.Add(Convert.ToInt32(data[1]), data[0]);
+                    textureTable.Add(Convert.ToInt32(data[0]), data[1].Replace(Environment.NewLine, ""));
                 }
 
                 streamReader.Close();
             }
 
-
-            Tilemap tilemap = new Tilemap();
 
 
 
@@ -190,18 +202,21 @@ namespace Library
             {
                 for (int y = 0; y < yMax - yMin; y++)
                 {
-                    if (sprites[x, y] != 0)
-                    {
-                        string spriteName = textureTable[sprites[x, y]];
 
-                        tilemap.SetTile(new Vector3Int(xMin + x, yMin + y, 0), groundTiles[spriteName]);
+                    Debug.Log("x: " + x + " y: " + y);
+                    Debug.Log(sprites[x][y]);
+
+                    if (sprites[x][y] != 0)
+                    {
+                        string spriteName = textureTable[sprites[x][y]];
+                        
+                        Vector3Int position = new Vector3Int(x, y, 0);
+                        
+                        background.SetTile(position, groundTiles[spriteName]);
                     }
 
                 }
             }
-
-
-            return tilemap;
         }
     }
 }

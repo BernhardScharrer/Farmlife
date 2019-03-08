@@ -55,7 +55,7 @@ public class Farmlife : MonoBehaviour
             Tile tile = new Tile();
             tile.sprite = sprite;
             tile.name = sprite.name;
-
+            
             groundTiles.Add(tile.name, tile);
         }
 
@@ -87,5 +87,17 @@ public class Farmlife : MonoBehaviour
         background.SetTile(position, groundTiles["field"]);
 
         Debug.Log("Inserted grass tile!");
+
+
+
+
+        Background test = new Background(background);
+
+        string testString = JsonUtility.ToJson(test);
+
+        Background test2 = JsonUtility.FromJson<Background>(testString);
+
+
+        test2.ToTilemap(background, groundTiles);
     }
 }
