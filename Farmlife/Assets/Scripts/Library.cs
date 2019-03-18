@@ -5,8 +5,52 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+
 namespace Library
 {
+    public static class Tools
+    {
+
+        public static Dictionary<string, Tile> LoadSprites()
+        {
+            //	-----------------------------------------------
+            //	create new dictionary to contain all sprites by name
+            //	-----------------------------------------------
+            Dictionary<string, Tile>  groundTiles = new Dictionary<string, Tile>();
+
+
+
+            //	-----------------------------------------------
+            //	Load the sprites
+            //	-----------------------------------------------
+            Debug.Log("Loading sprites ...");
+            Sprite[] spritesArr = Resources.LoadAll<Sprite>("SpriteSheet_Tiles");
+            Debug.Log("Loaded sprites: " + spritesArr.Length);
+
+
+
+            //	------------------------------------------------------
+            //	Convert sprites to tiles and save them in a dictionary
+            //	------------------------------------------------------
+            Debug.Log("Converting sprites to tiles ...");
+
+            foreach (var sprite in spritesArr)
+            {
+                Tile tile = new Tile();
+                tile.sprite = sprite;
+                tile.name = sprite.name;
+
+                groundTiles.Add(tile.name, tile);
+            }
+
+            Debug.Log("Conversion done ...");
+
+
+            return groundTiles;
+        }
+
+    }
+
 
     static class Tables
     {
@@ -89,7 +133,7 @@ namespace Library
     public class Background
     {
         [SerializeField]
-        int[][] sprites;
+        Line[] sprites;
 
         [SerializeField]
         int xMin;
@@ -105,8 +149,12 @@ namespace Library
         
 
 
+
+
         public Background(Tilemap tilemap)
         {
+            Debug.Log("Saving Background ...");
+
             BoundsInt bounds = tilemap.cellBounds;
 
             xMin = bounds.xMin;
@@ -140,13 +188,15 @@ namespace Library
             //	--------------------------------------------------------------------
             //	Save every tiles actual sprite as sprite number to the sprites array
             //	--------------------------------------------------------------------
-            sprites = new int[xMax - xMin][];
+            sprites = new Line[yMax - yMin];
 
 
 
             for (int i = 0; i < sprites.Length; i++)
             {
-                sprites[i] = new int[yMax - yMin];
+                sprites[i] = new Line();
+
+                sprites[i].sprites = new int[xMax - xMin];
             }
 
 
@@ -159,19 +209,23 @@ namespace Library
 
                     if (tile != null)
                     {
-                        sprites[x][y] = textureTable[tile.name];
+                        sprites[y - yMin].sprites[x - xMin] = textureTable[tile.name];
+
+                        Debug.Log("[" + x + "|" + y + "]: " + sprites[y].sprites[x]);
                     }
                     
                 }
             }
-            
-            Debug.Log("[0|0]: " + sprites[0][0]);
+
+            Debug.Log("Done saving!");
         }
 
 
 
         public void ToTilemap(Tilemap background, Dictionary<string, Tile> groundTiles)
         {
+            Debug.Log("Loading Background ...");
+
             //	--------------------------------------------------------
             //	Load textureTable with codes and save it to a dictionary
             //	--------------------------------------------------------
@@ -202,21 +256,35 @@ namespace Library
             {
                 for (int y = 0; y < yMax - yMin; y++)
                 {
+                    Debug.Log("[" + x + "|" + y + "]: " + sprites[y].sprites[x]);
 
-                    Debug.Log("x: " + x + " y: " + y);
-                    Debug.Log(sprites[x][y]);
-
-                    if (sprites[x][y] != 0)
+                    if (sprites[y].sprites[x] != 0)
                     {
-                        string spriteName = textureTable[sprites[x][y]];
+                        string spriteName = textureTable[sprites[y].sprites[x]];
                         
-                        Vector3Int position = new Vector3Int(x, y, 0);
+                        Vector3Int position = new Vector3Int(x + xMin, y + yMin, 0);
                         
                         background.SetTile(position, groundTiles[spriteName]);
                     }
 
                 }
             }
+
+            Debug.Log("Done loading!");
+        }
+    }
+
+    
+
+    [Serializable]
+    class Line
+    {
+        [SerializeField]
+        public int[] sprites;
+
+        public Line()
+        {
+            
         }
     }
 }

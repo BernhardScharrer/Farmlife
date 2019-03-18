@@ -27,47 +27,13 @@ public class Farmlife : MonoBehaviour
 
 
 
-    private void LoadSprites()
-    {
-        //	-----------------------------------------------
-        //	create new dictionary to contain all sprites by name
-        //	-----------------------------------------------
-        groundTiles = new Dictionary<string, Tile>();
-
-
-
-        //	-----------------------------------------------
-        //	Load the sprites
-        //	-----------------------------------------------
-        Debug.Log("Loading sprites ...");
-        Sprite[] spritesArr = Resources.LoadAll<Sprite>("SpriteSheet_Tiles");
-        Debug.Log("Loaded sprites: " + spritesArr.Length);
-
-
-
-        //	------------------------------------------------------
-        //	Convert sprites to tiles and save them in a dictionary
-        //	------------------------------------------------------
-        Debug.Log("Converting sprites to tiles ...");
-
-        foreach (var sprite in spritesArr)
-        {
-            Tile tile = new Tile();
-            tile.sprite = sprite;
-            tile.name = sprite.name;
-            
-            groundTiles.Add(tile.name, tile);
-        }
-
-        Debug.Log("Conversion done ...");
-
-    }
+    
 
 
 
     private void LoadMap()
     {
-        LoadSprites();
+        groundTiles = Tools.LoadSprites();
 
         Debug.Log("Getting reference to tilemaps");
         Tilemap background = map.transform.Find("Background").gameObject.GetComponent<Tilemap>();
