@@ -18,6 +18,8 @@ public class Editor : MonoBehaviour
     {
         groundTiles = Tools.LoadSprites();
 
+        this.transform.parent.GetChild(3);
+
         Debug.Log("Getting reference to tilemaps");
         background = map.transform.Find("Background").gameObject.GetComponent<Tilemap>();
         
@@ -28,24 +30,29 @@ public class Editor : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            //create a ray cast and set it to the mouses cursor position in game
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit))
-            {
-                //draw invisible ray cast/vector
-                //Debug.DrawLine(ray.origin, hit.point);
-                //log hit area to the console
-                //Debug.Log(hit.point);
+            ////create a ray cast and set it to the mouses cursor position in game
+            //Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            //RaycastHit hit;
+            //if (Physics.Raycast(ray, out hit))
+            //{
+            //    Debug.Log("Mouse position: " + hit.point);
 
-                Debug.Log("Mouse position: " + hit.point);
+            //    
 
-                Vector3Int tilePos = new Vector3Int(Mathf.FloorToInt(hit.point.x), Mathf.FloorToInt(hit.point.y), 0);
+            //    Debug.Log("Inserting grass tile ...");
 
-                Debug.Log("Inserting grass tile ...");
+            //    
 
-                background.SetTile(tilePos, groundTiles["grass"]);
-            }
+            //    
+            //}
+
+            Debug.Log("Mouse Click: [" + Input.mousePosition.x + "|" + Input.mousePosition.y + "]");
+
+            Vector3Int tilePos = new Vector3Int(Mathf.FloorToInt(Input.mousePosition.x), Mathf.FloorToInt(Input.mousePosition.y), 0);
+
+            Tile grass = groundTiles["grass"];
+
+            background.SetTile(tilePos, grass);
         }
     }
 
